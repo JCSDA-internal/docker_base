@@ -7,7 +7,7 @@ RUN apt-get update \
     && apt-add-repository ppa:ubuntu-toolchain-r/test \
     && apt-add-repository ppa:george-edison55/cmake-3.x \
     && apt-get update \
-    && buildDeps='build-essential libcurl4-openssl-dev libexpat1-dev openssh-server libncurses-dev libssl-dev libxml2-dev autoconf git cmake csh ksh vim file curl wget texinfo flex bison gcc-7 gfortran-7 g++-7 ' \ 
+    && buildDeps='build-essential libcurl4-openssl-dev libexpat1-dev openssh-server libncurses-dev libssl-dev libxml2-dev autoconf locales pkg-config git cmake csh ksh vim file curl wget texinfo flex bison gcc-7 gfortran-7 g++-7 ' \ 
     && apt-get install -y --no-install-recommends $buildDeps \
     && apt-get purge -y gcc g++ \
     && apt-get purge -y gcc-5 g++-5 \
@@ -25,7 +25,8 @@ RUN apt-get update \
     && opal_check_cma_happy=0 ./configure --enable-mpi-cxx  \
     && make -j `nproc` all && make install \
     && cd /usr/local/src \
-    && rm -rf openmpi-2.1.0
+    && rm -rf openmpi-2.1.0 \
+    && locale-gen en_US.UTF-8
     
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
