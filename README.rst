@@ -13,6 +13,7 @@ Docker base container for *JEDI*, this image include the basic tools, such as :
 - csh
 - ksh 
 - kdbg
+- ddd
 - etc..
 
 How to build the docker_base image
