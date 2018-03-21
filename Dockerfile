@@ -7,7 +7,7 @@ RUN apt-get update \
     && apt-add-repository ppa:ubuntu-toolchain-r/test \
     && apt-add-repository ppa:george-edison55/cmake-3.x \
     && apt-get update \
-    && buildDeps='build-essential libcurl4-openssl-dev libexpat1-dev openssh-server libncurses-dev libssl-dev libxml2-dev autoconf locales pkg-config git cmake csh ksh vim file curl wget texinfo flex bison gcc-7 gfortran-7 g++-7 emacs git-flow gdb kdbg ddd python-dev texlive-latex-recommended' \
+    && buildDeps='python-pip build-essential libcurl4-openssl-dev libexpat1-dev openssh-server libncurses-dev libssl-dev libxml2-dev autoconf locales pkg-config git cmake csh ksh vim file curl wget texinfo flex bison gcc-7 gfortran-7 g++-7 emacs git-flow gdb kdbg ddd python-dev graphviz texlive-latex-recommended libarmadillo-dev swig bc tk tcl libx11-dev subversion' \
     && apt-get install -y --no-install-recommends $buildDeps \
     && apt-get purge -y gcc g++ \
     && apt-get purge -y gcc-5 g++-5 \
@@ -42,5 +42,7 @@ RUN apt-get update \
     
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ENV PATH=.:/usr/loca/bin:$PATH
+
+COPY tkdiff /usr/bin/.
 
 CMD ["/bin/bash" , "-l"]
