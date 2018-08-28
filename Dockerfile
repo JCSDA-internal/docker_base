@@ -20,16 +20,16 @@ RUN apt-get clean \
     && git lfs install \
     && rm -rf /var/lib/apt/lists/* \
     && cd /usr/local/src \
-    && wget --no-check-certificate https://www.open-mpi.org/software/ompi/v2.1/downloads/openmpi-2.1.0.tar.gz \
-    && tar xf openmpi-2.1.0.tar.gz \
-    && rm openmpi-2.1.0.tar.gz \
-    && cd openmpi-2.1.0 \
+    && wget --no-check-certificate https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.1.tar.gz \
+    && tar xf openmpi-3.1.1.tar.gz \
+    && rm openmpi-3.1.1.tar.gz \
+    && cd openmpi-3.1.1 \
     && gcc --version \
     && gfortran --version \
     && opal_check_cma_happy=0 ./configure --enable-mpi-cxx  \
     && make -j `nproc` all && make install \
     && cd /usr/local/src \
-    && rm -rf openmpi-2.1.0 \
+    && rm -rf openmpi-3.1.1 \
     && locale-gen en_US.UTF-8 \
     && git clone https://github.com/doxygen/doxygen.git \
     && cd doxygen \
