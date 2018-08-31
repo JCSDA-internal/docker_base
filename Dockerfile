@@ -40,7 +40,7 @@ RUN apt-get clean \
     && make install \
     && cd /usr/local/src \
     && rm -rf doxygen \
-    && apt-get remove -y liblapack-dev libhdf5-dev libarmadillo-dev libjpeg8-dev libsz2 libhdf5-cpp-11 libjpeg-dev libhdf5-10 libblas-common libblas-dev libblas3 hdf5-helpers libjpeg-turbo8-dev
+    && apt-get remove -y libhdf5-dev libjpeg8-dev libsz2 libhdf5-cpp-11 libjpeg-dev libhdf5-10 libblas-common libblas3 hdf5-helpers libjpeg-turbo8-dev
     
 ENV LD_LIBRARY_PATH=/usr/local/lib
 ENV PATH=.:/usr/loca/bin:$PATH
