@@ -10,6 +10,8 @@ RUN apt-get clean \
     && apt-get update \
     && buildDeps='python-pip build-essential libcurl4-openssl-dev libexpat1-dev openssh-server libncurses-dev libssl-dev libxml2-dev autoconf locales pkg-config git cmake tcsh csh ksh vim file curl wget texinfo flex bison gcc-7 gfortran-7 g++-7 emacs git-flow gdb kdbg ddd python-dev graphviz texlive-latex-recommended libarmadillo-dev swig bc tk tcl libx11-dev subversion lynx valgrind less nedit man-db' \
     && apt-get install -y --no-install-recommends $buildDeps \
+    && pip install -U pip \
+    && pip --version \
     && apt-get purge -y gcc g++ \
     && apt-get purge -y gcc-5 g++-5 \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 10 \
