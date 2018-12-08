@@ -15,6 +15,7 @@ RUN apt-get clean \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 10 \
     && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 10 \
     && update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-7 10 \
+    && update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-7 10 \
     && curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash \
     && apt-get install git-lfs \
     && git lfs install \
