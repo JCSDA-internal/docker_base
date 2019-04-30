@@ -39,12 +39,12 @@ Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
                               'python3-numpy','python3-scipy'])
 
 # Mellanox OFED
-#Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
+Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
 
 # PSM library
-#Stage0 += apt_get(ospackages=['libpsm-infinipath1','libpsm-infinipath1-dev'])
+Stage0 += apt_get(ospackages=['libpsm-infinipath1','libpsm-infinipath1-dev'])
 
 # OpenMPI
-#Stage0 += openmpi(cuda=False, infiniband=True, version='3.1.2', 
-#                  configure_opts=['--enable-mpi-cxx --with-psm'])
+Stage0 += openmpi(cuda=False, infiniband=True, version='3.1.2', 
+                  configure_opts=['--enable-mpi-cxx --with-psm'])
 

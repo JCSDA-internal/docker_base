@@ -4,7 +4,8 @@ docker_base
 Docker base container for *JEDI*.
 
 The main responsibility of this repository is to set up a Docker image file
-that includes these basic components
+that includes these basic components:
+
 - An ubuntu 18.04 operating system
 - GNU compiler suite (currently version 7.4)
 - An MPI library
@@ -13,18 +14,15 @@ The main development container currently uses openmpi but other
 options such as `mpich` and `mvapich` can also be easily accommodated.
 
 In addition to these essential components, there are package installs
-of a number of 
+of a number of other tools, including
 
-- wget
-- curl
-- git
-- git-flow 
-- git-lfs 
-- cmake
-- csh
-- ksh 
-- kdbg
-- ddd
+- wget, curl
+- git, git-flow, git-lfs 
+- cmake, autoconfig
+- vim, emacs, nedit
+- doxygen, latex
+- python, python3 (numpy, scipy, yaml)
+- debuggers: kdbg, valgrind
 - etc..
 
 How to build the docker_base image
