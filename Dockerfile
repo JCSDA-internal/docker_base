@@ -129,7 +129,8 @@ RUN apt-get update && \
     ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime && \
     locale-gen --purge en_US.UTF-8 && \
     dpkg-reconfigure --frontend noninteractive tzdata && \
-    echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale && \
-    dpkg-reconfigure --frontend=noninteractive locales
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale "LANG=en_US.UTF-8" && \
+    update-locale "LANGUAGE=en_US:en"
 
 
