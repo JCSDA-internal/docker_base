@@ -28,7 +28,6 @@ RUN apt-get update -y && \
         tcl \
         swig \
         bc \
-        locales \
         file \
         flex \
         bison \
@@ -118,11 +117,19 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.bz2 && \
     mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-3.1.2.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/openmpi-3.1.2 &&   ./configure --prefix=/usr/local/openmpi --enable-mpi-cxx --with-psm --without-cuda --with-verbs && \
+    cd /var/tmp/openmpi-3.1.2 &&   ./configure --prefix=/usr/local --enable-mpi-cxx --with-psm --without-cuda --with-verbs && \
     make -j$(nproc) && \
     make -j$(nproc) install && \
     rm -rf /var/tmp/openmpi-3.1.2.tar.bz2 /var/tmp/openmpi-3.1.2
-ENV LD_LIBRARY_PATH=/usr/local/openmpi/lib:$LD_LIBRARY_PATH \
-    PATH=/usr/local/openmpi/bin:$PATH
+ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
+    PATH=/usr/local/bin:$PATH
+
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales && \
+    ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime && \
+    locale-gen --purge en_US.UTF-8 && \
+    dpkg-reconfigure --frontend noninteractive tzdata && \
+    echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale && \
+    dpkg-reconfigure --frontend=noninteractive locales
 
 

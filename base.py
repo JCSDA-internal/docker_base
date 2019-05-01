@@ -1,7 +1,7 @@
 """Prototype JEDI docker_base container
 
 Usage:
-$ ../hpccm.py --recipe base.py --format docker > Dockerfile
+$ ../hpc-container-maker/hpccm.py --recipe base.py --format docker > Dockerfile
 """
 
 # Base image
@@ -15,9 +15,9 @@ Stage0 += gnu(version='7')
 Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',	    
                               'openssh-server','libncurses-dev','libssl-dev',
                               'libx11-dev','less','man-db','tk','tcl','swig',
-                              'bc','locales','file','flex','bison',
-                              'libexpat1-dev','libxml2-dev','unzip','wish',
-                              'curl','wget','libcurl4-openssl-dev'])
+                              'bc','file','flex','bison','libexpat1-dev',
+                              'libxml2-dev','unzip','wish','curl','wget',
+                              'libcurl4-openssl-dev'])
 
 # editors, document tools, git, and git-flow                   
 Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
@@ -45,6 +45,16 @@ Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
 Stage0 += apt_get(ospackages=['libpsm-infinipath1','libpsm-infinipath1-dev'])
 
 # OpenMPI
-Stage0 += openmpi(cuda=False, infiniband=True, version='3.1.2', 
+Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=True, 
                   configure_opts=['--enable-mpi-cxx --with-psm'])
+
+# locales time zone and language support
+Stage0 += shell(commands=
+    ['apt-get update',
+     'DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales',
+     'ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime',
+     'locale-gen --purge en_US.UTF-8',
+     'dpkg-reconfigure --frontend noninteractive tzdata',
+     'echo -e \'LANG=\"en_US.UTF-8\"\\nLANGUAGE=\"en_US:en\"\\n\' > /etc/default/locale',
+     'dpkg-reconfigure --frontend=noninteractive locales'])
 
