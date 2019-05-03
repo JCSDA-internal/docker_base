@@ -5,10 +5,17 @@ $ ../hpc-container-maker/hpccm.py --recipe base.py --format docker > Dockerfile
 """
 
 # Base image
-Stage0.baseimage('ubuntu:18.04')
+Stage0.baseimage('ubuntu:16.04')
+
+# update apt keys
+Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
+                          'apt-get update'])
 
 # Install GNU compilers 
-Stage0 += gnu(version='7')
+Stage0 += gnu(extra_repository=True,version='7')
+
+# get an up-to-date version of CMake
+Stage0 += cmake(eula=True,version="3.13.0")
 
 # useful system tools 
 # libexpat is required by udunits
@@ -28,9 +35,8 @@ Stage0 += shell(commands=
                 ['curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash',
                  'apt-get update','apt-get install -y --no-install-recommends git-lfs'])
                   
-# autoconfig, cmake, and debuggers                  
-Stage0 += apt_get(ospackages=['autoconf','pkg-config','cmake','ddd','gdb','kdbg',
-                              'valgrind'])
+# autoconfig and debuggers                  
+Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
     
 # python
 Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
@@ -49,8 +55,7 @@ Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=T
                   configure_opts=['--enable-mpi-cxx --with-psm'])
 
 # locales time zone and language support
-Stage0 += shell(commands=
-    ['apt-get update',
+Stage0 += shell(commands=['apt-get update',
      'DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales',
      'ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime',
      'locale-gen --purge en_US.UTF-8',
