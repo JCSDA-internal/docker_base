@@ -3,30 +3,6 @@ FROM ubuntu:16.04 AS stage0
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 && \
     apt-get update
 
-# GNU compiler
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends software-properties-common && \
-    apt-add-repository ppa:ubuntu-toolchain-r/test -y && \
-    apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        gcc-7 \
-        g++-7 \
-        gfortran-7 && \
-    rm -rf /var/lib/apt/lists/*
-RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-7) 30 && \
-    update-alternatives --install /usr/bin/g++ g++ $(which g++-7) 30 && \
-    update-alternatives --install /usr/bin/gfortran gfortran $(which gfortran-7) 30 && \
-    update-alternatives --install /usr/bin/gcov gcov $(which gcov-7) 30
-
-# CMake version 3.13.0
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        wget && \
-    rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh && \
-    /bin/sh /var/tmp/cmake-3.13.0-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
-    rm -rf /var/tmp/cmake-3.13.0-Linux-x86_64.sh
-
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         build-essential \
@@ -54,6 +30,30 @@ RUN apt-get update -y && \
         wget \
         libcurl4-openssl-dev && \
     rm -rf /var/lib/apt/lists/*
+
+# GNU compiler
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends software-properties-common && \
+    apt-add-repository ppa:ubuntu-toolchain-r/test -y && \
+    apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gcc-7 \
+        g++-7 \
+        gfortran-7 && \
+    rm -rf /var/lib/apt/lists/*
+RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-7) 30 && \
+    update-alternatives --install /usr/bin/g++ g++ $(which g++-7) 30 && \
+    update-alternatives --install /usr/bin/gfortran gfortran $(which gfortran-7) 30 && \
+    update-alternatives --install /usr/bin/gcov gcov $(which gcov-7) 30
+
+# CMake version 3.13.0
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.13/cmake-3.13.0-Linux-x86_64.sh && \
+    /bin/sh /var/tmp/cmake-3.13.0-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
+    rm -rf /var/tmp/cmake-3.13.0-Linux-x86_64.sh
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

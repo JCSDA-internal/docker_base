@@ -11,12 +11,6 @@ Stage0.baseimage('ubuntu:16.04')
 Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
                           'apt-get update'])
 
-# Install GNU compilers 
-Stage0 += gnu(extra_repository=True,version='7')
-
-# get an up-to-date version of CMake
-Stage0 += cmake(eula=True,version="3.13.0")
-
 # useful system tools 
 # libexpat is required by udunits
 Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',	    
@@ -25,6 +19,12 @@ Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',
                               'bc','file','flex','bison','libexpat1-dev',
                               'libxml2-dev','unzip','wish','curl','wget',
                               'libcurl4-openssl-dev'])
+
+# Install GNU compilers 
+Stage0 += gnu(extra_repository=True,version='7')
+
+# get an up-to-date version of CMake
+Stage0 += cmake(eula=True,version="3.13.0")
 
 # editors, document tools, git, and git-flow                   
 Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
