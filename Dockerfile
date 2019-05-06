@@ -89,7 +89,11 @@ RUN apt-get update -y && \
         python-dev \
         python-yaml \
         python-numpy \
-        python-scipy \
+        python-scipy && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         python3-pip \
         python3-dev \
         python3-yaml \

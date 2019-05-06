@@ -6,12 +6,9 @@ Docker base container for *JEDI*.
 The main responsibility of this repository is to set up a Docker image file
 that includes these basic components:
 
-- An ubuntu 18.04 operating system
+- An ubuntu 16.04 operating system
 - GNU compiler suite (currently version 7.4)
-- An MPI library
-
-The main development container currently uses openmpi but other
-options such as `mpich` and `mvapich` can also be easily accommodated.
+- An MPI library (currently openmpi but other options such as mpich will be developed in the future)
 
 In addition to these essential components, there are package installs
 of a number of other tools, including

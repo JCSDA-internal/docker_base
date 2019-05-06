@@ -40,8 +40,10 @@ Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgri
     
 # python
 Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
-	                      'python-numpy','python-scipy',
-                              'python3-pip','python3-dev','python3-yaml',
+                              'python-numpy','python-scipy'])
+
+# python
+Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
                               'python3-numpy','python3-scipy'])
 
 # Mellanox OFED
