@@ -5,30 +5,30 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 &&
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bc \
+        bison \
         build-essential \
-        tcsh \
         csh \
+        curl \
+        file \
+        flex \
         ksh \
-        openssh-server \
+        less \
+        libcurl4-openssl-dev \
+        libexpat1-dev \
         libncurses-dev \
         libssl-dev \
         libx11-dev \
-        less \
-        man-db \
-        tk \
-        tcl \
-        swig \
-        bc \
-        file \
-        flex \
-        bison \
-        libexpat1-dev \
         libxml2-dev \
+        man-db \
+        openssh-server \
+        swig \
+        tcl \
+        tcsh \
+        tk \
         unzip \
-        wish \
-        curl \
         wget \
-        libcurl4-openssl-dev && \
+        wish && \
     rm -rf /var/lib/apt/lists/*
 
 # GNU compiler
@@ -37,8 +37,8 @@ RUN apt-get update -y && \
     apt-add-repository ppa:ubuntu-toolchain-r/test -y && \
     apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        gcc-7 \
         g++-7 \
+        gcc-7 \
         gfortran-7 && \
     rm -rf /var/lib/apt/lists/*
 RUN update-alternatives --install /usr/bin/gcc gcc $(which gcc-7) 30 && \
@@ -57,16 +57,16 @@ RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        emacs \
-        vim \
-        nedit \
-        graphviz \
         doxygen \
-        texlive-latex-recommended \
-        texinfo \
-        lynx \
+        emacs \
         git \
-        git-flow && \
+        git-flow \
+        graphviz \
+        lynx \
+        nedit \
+        texinfo \
+        texlive-latex-recommended \
+        vim && \
     rm -rf /var/lib/apt/lists/*
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
@@ -76,29 +76,29 @@ RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.d
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         autoconf \
-        pkg-config \
         ddd \
         gdb \
         kdbg \
+        pkg-config \
         valgrind && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python-pip \
         python-dev \
-        python-yaml \
         python-numpy \
-        python-scipy && \
+        python-pip \
+        python-scipy \
+        python-yaml && \
     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python3-pip \
         python3-dev \
-        python3-yaml \
         python3-numpy \
-        python3-scipy && \
+        python3-pip \
+        python3-scipy \
+        python3-yaml && \
     rm -rf /var/lib/apt/lists/*
 
 # Mellanox OFED version 4.5-1.0.1.0
