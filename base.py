@@ -18,7 +18,7 @@ Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',
                               'libx11-dev','less','man-db','tk','tcl','swig',
                               'bc','file','flex','bison','libexpat1-dev',
                               'libxml2-dev','unzip','wish','curl','wget',
-                              'libcurl4-openssl-dev'])
+                              'libcurl4-openssl-dev','nano','screen'])
 
 # Install GNU compilers 
 Stage0 += gnu(extra_repository=True,version='7')

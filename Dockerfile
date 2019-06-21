@@ -21,7 +21,9 @@ RUN apt-get update -y && \
         libx11-dev \
         libxml2-dev \
         man-db \
+        nano \
         openssh-server \
+        screen \
         swig \
         tcl \
         tcsh \
