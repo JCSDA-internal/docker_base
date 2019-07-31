@@ -85,24 +85,6 @@ RUN apt-get update -y && \
         valgrind && \
     rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python-dev \
-        python-numpy \
-        python-pip \
-        python-scipy \
-        python-yaml && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python3-dev \
-        python3-numpy \
-        python3-pip \
-        python3-scipy \
-        python3-yaml && \
-    rm -rf /var/lib/apt/lists/*
-
 # Mellanox OFED version 4.5-1.0.1.0
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
