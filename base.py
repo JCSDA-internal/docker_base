@@ -1,4 +1,4 @@
-"""Prototype JEDI docker_base container
+"""JEDI docker_base container
 
 Usage:
 $ ../hpc-container-maker/hpccm.py --recipe base.py --format docker > Dockerfile
