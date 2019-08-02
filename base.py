@@ -1,4 +1,4 @@
-"""JEDI docker_base container
+"""Prototype JEDI docker_base container
 
 Usage:
 $ ../hpc-container-maker/hpccm.py --recipe base.py --format docker > Dockerfile
@@ -39,7 +39,12 @@ Stage0 += shell(commands=
 Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
     
 # python
-Stage0 += apt_get(ospackages=['python-pip','python-dev','python3-pip','python3-dev'])
+Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
+                              'python-scipy'])
+
+# python
+Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
+                              'python3-scipy'])
 
 # Mellanox OFED
 Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
