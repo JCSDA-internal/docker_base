@@ -33,7 +33,7 @@ Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
 # git-lfs
 Stage0 += shell(commands=
                 ['curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash',
-                 'apt-get update','apt-get install -y --no-install-recommends git-lfs'])
+                 'apt-get update','apt-get install -y --no-install-recommends git-lfs', 'git lfs install'])
                   
 # autoconfig and debuggers                  
 Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])

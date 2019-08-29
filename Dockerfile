@@ -73,7 +73,8 @@ RUN apt-get update -y && \
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git-lfs
+    apt-get install -y --no-install-recommends git-lfs && \
+    git lfs install
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
