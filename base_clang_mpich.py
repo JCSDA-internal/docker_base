@@ -62,7 +62,8 @@ Stage0 += shell(commands=['mkdir -p /var/tmp',
     'wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/$version/mpich-$version.tar.gz',
     'tar -x -f /var/tmp/mpich-$version.tar.gz -C /var/tmp -z', 'cd /var/tmp/mpich-$version',
     './configure --prefix=/usr/local/mpich --enable-fortran --enable-cxx',
-    'make -j4', 'make install'])
+    'make -j4', 'make install','rm -rf /var/tmp/mpich-$version.tar.gz',
+    'rm -rf /var/tmp/mpich-$version'])
 
 Stage0 += environment(variables={'LD_LIBRARY_PATH':'/usr/local/mpich/lib:$LD_LIBRARY_PATH',
     'PATH':'/usr/local/mpich/bin:$PATH'})
