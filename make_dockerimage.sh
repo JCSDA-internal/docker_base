@@ -11,4 +11,7 @@ $HPCCM --recipe base-$1.py --format docker > Dockerfile.$1
 echo "Generated with hpccm version: " > generated.version
 $HPCCM --version >> generated.version
 
-docker image build --no-cache -f Dockerfile.$name -t jcsda/docker_base-$name .
+docker image build --no-cache -f Dockerfile.$1 -t jcsda/docker_base-$1 .
+
+# might want to do this manually after testing
+# docker push jcsda/docker_base-$1
