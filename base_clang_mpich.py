@@ -55,18 +55,11 @@ Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
 
 #mpich
 # have to do this manually since the builing block doesn't work
-Stage0 += environment(variables={'version':'3.3.1','FC':'gfortran','CC':'clang', 
-    'CXX':'clang++','CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
+Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
+    'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
 
-Stage0 += shell(commands=['mkdir -p /var/tmp', 
-    'wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/$version/mpich-$version.tar.gz',
-    'tar -x -f /var/tmp/mpich-$version.tar.gz -C /var/tmp -z', 'cd /var/tmp/mpich-$version',
-    './configure --prefix=/usr/local/mpich --enable-fortran --enable-cxx',
-    'make -j4', 'make install','rm -rf /var/tmp/mpich-$version.tar.gz',
-    'rm -rf /var/tmp/mpich-$version'])
-
-Stage0 += environment(variables={'LD_LIBRARY_PATH':'/usr/local/mpich/lib:$LD_LIBRARY_PATH',
-    'PATH':'/usr/local/mpich/bin:$PATH'})
+#Stage0 += shell(commands=['mkdir -p /var/tmp', 
+Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
 
 # locales time zone and language support
 Stage0 += shell(commands=['apt-get update',
