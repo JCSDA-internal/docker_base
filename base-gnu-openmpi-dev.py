@@ -5,15 +5,15 @@ $ ../hpc-container-maker/hpccm.py --recipe base.py --format docker > Dockerfile
 """
 
 # Base image
-Stage0.baseimage('ubuntu:16.04')
+Stage0.baseimage('ubuntu:18.04')
 
 # update apt keys
-Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
-                          'apt-get update'])
+#Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
+#                          'apt-get update'])
 
 # useful system tools 
 # libexpat is required by udunits
-Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',	    
+Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh','apt-utils',
                               'openssh-server','libncurses-dev','libssl-dev',
                               'libx11-dev','less','man-db','tk','tcl','swig',
                               'bc','file','flex','bison','libexpat1-dev',
@@ -21,7 +21,7 @@ Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',
                               'libcurl4-openssl-dev','nano','screen'])
 
 # Install GNU compilers 
-Stage0 += gnu(extra_repository=True,version='7')
+Stage0 += gnu(version='7')
 
 # get an up-to-date version of CMake
 Stage0 += cmake(eula=True,version="3.13.0")
@@ -38,13 +38,10 @@ Stage0 += shell(commands=
 # autoconfig and debuggers                  
 Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
     
-# python
-Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
-                              'python-scipy'])
-
-# python
+# python3
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
                               'python3-scipy'])
+Stage0 += shell(commands=['ln -s /usr/bin/python3 /usr/bin/python'])
 
 # Mellanox OFED
 Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
