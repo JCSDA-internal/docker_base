@@ -18,6 +18,7 @@ RUN apt-get update -y && \
         libssl-dev \
         libx11-dev \
         libxml2-dev \
+        lsb-release \
         man-db \
         nano \
         openssh-server \
