@@ -40,10 +40,6 @@ Stage0 += shell(commands=
 Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
     
 # python
-Stage0 += apt_get(ospackages=['python-pip','python-dev','python-yaml',
-                              'python-scipy'])
-
-# python
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
                               'python3-scipy'])
 
