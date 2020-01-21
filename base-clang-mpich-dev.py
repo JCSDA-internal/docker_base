@@ -42,6 +42,7 @@ Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgri
 # python
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
                               'python3-scipy'])
+Stage0 += shell(commands=['ln -s /usr/bin/python3 /usr/bin/python'])
 
 # Mellanox OFED
 #Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
