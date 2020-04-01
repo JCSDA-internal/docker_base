@@ -21,7 +21,7 @@ Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh','apt-utils',
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
 
 # Install GNU compilers 
-Stage0 += gnu(version='9')
+Stage0 += gnu(version='7')
 
 # get an up-to-date version of CMake
 Stage0 += cmake(eula=True,version="3.16.0")
@@ -54,12 +54,12 @@ Stage0 += apt_get(ospackages=['libpsm-infinipath1','libpsm-infinipath1-dev'])
 Stage0 += slurm_pmi2()
 
 # UCX and components
-Stage0 = knem()
-Stage0 = xpmem()
-Stage0 = ucx(ofed=True,knem=True,xpmem=True,cuda=False)
+Stage0 += knem()
+Stage0 += xpmem()
+Stage0 += ucx(ofed=True,knem=True,xpmem=True,cuda=False)
 
 # OpenMPI
-Stage0 += openmpi(prefix='/usr/local', version='4.0.1', cuda=False, infiniband=True, 
+Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=True, 
                   pmi="/usr/local/slurm-pmi2",ucx=True, 
                   with_psm='/usr/lib/x86_64-linux-gnu/libpsm_infinipath.so',
                   configure_opts=['--enable-mpi-cxx'])

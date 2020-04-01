@@ -8,3 +8,4 @@ share
 licenses
 mod
 build*
+*.log
