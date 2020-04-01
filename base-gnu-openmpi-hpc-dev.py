@@ -60,8 +60,7 @@ Stage0 += ucx(ofed=True,knem=True,xpmem=True,cuda=False)
 
 # OpenMPI
 Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=True, 
-                  pmi="/usr/local/slurm-pmi2",ucx=True, 
-                  with_psm='/usr/lib/x86_64-linux-gnu/libpsm_infinipath.so',
+                  pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=True,
                   configure_opts=['--enable-mpi-cxx'])
 
 # locales time zone and language support
