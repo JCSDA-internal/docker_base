@@ -35,15 +35,28 @@ NAME=${1:-"gnu-openmpi-dev"}
 TAG=${2:-"latest"}
 HPC=${3:-"0"}
 
+CompilerName=$(echo $NAME| cut -d- -f1)
+MPIName=$(echo $NAME| cut -d- -f2)
+
 case ${HPC} in
     "0")
-        hpccm --recipe base-$NAME.py --format docker > Dockerfile.$NAME
+        hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
+                                                     mpi=${MPIName} \
+	                                              --format docker > Dockerfile.$NAME
         ;;
     "0")
-        hpccm --recipe base-$NAME.py --userarg hpc="True" --format docker > Dockerfile.$NAME
+        hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
+                                                     mpi=${MPIName} \
+                                                     hpc="True" \
+                                                      --format docker > Dockerfile.$NAME
         ;;
     "0")
-        hpccm --recipe base-$NAME.py --userarg hpc="True" mellanox="True" psm="True" --format docker > Dockerfile.$NAME
+        hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
+                                                     mpi=${MPIName} \
+                                                     hpc="True" \
+                                                     mellanox="True" \
+                                                     psm="True" \
+                                                     --format docker > Dockerfile.$NAME
         ;;
     *)
         echo "ERROR: unsupported HPC option"
@@ -54,7 +67,7 @@ esac
 echo "Generated with hpccm version: " > generated.version
 hpccm --version >> generated.version
 
-docker image build --no-cache -f Dockerfile.$NAME -t jcsda/docker_base-$NAME:$TAG .
+echo docker image build --no-cache -f Dockerfile.$NAME -t jcsda/docker_base-$NAME:$TAG .
 
 # might want to do this manually after testing
 # docker push jcsda/docker_base-$NAME

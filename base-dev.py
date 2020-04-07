@@ -1,13 +1,15 @@
-"""Prototype JEDI docker_base development container for gnu-openmpi
+"""JEDI docker_base development container
 
 Usage:
-hpccm --recipe base-gnu-openmpi-dev.py --userarg hpc="True" psm="True" --format docker > Dockerfile
+hpccm --recipe base-dev.py --userarg compiler="gnu" mpi="openmpi" hpc="True" psm="True" --format docker > Dockerfile
 """
 
 # Base image
 Stage0.baseimage('ubuntu:18.04')
 
 # get optional user arguments
+mycompiler = USERARG.get('compiler', 'gnu')
+mympi = USERARG.get('mpi', 'openmpi')
 hpcstring = USERARG.get('hpc', 'False')
 mxofed = USERARG.get('mellanox', 'False')
 psm = USERARG.get('psm', 'False')
@@ -30,8 +32,12 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libxml2-dev','unzip','wish','curl','wget','time',
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
 
-# Install GNU compilers 
+# Install GNU compilers - even clang needs gfortran
 Stage0 += gnu(version='7')
+
+# Install clang compilers 
+if (mycompiler.lower() == "clang"):
+    Stage0 += llvm(extra_repository=True, version='8')
 
 # get an up-to-date version of CMake
 Stage0 += cmake(eula=True,version="3.16.0")
@@ -76,14 +82,32 @@ if (hpc):
     Stage0 += xpmem()
     Stage0 += ucx(ofed=True,knem=True,xpmem=True,cuda=False)
 
-else:
-    infiniband=False
-    withpsm=False
+    if (mympi.lower() == "mpich"):
 
-# OpenMPI
-Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=infiniband, 
-                  pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
-                  configure_opts=['--enable-mpi-cxx'])
+        #mpich
+        # have to do this manually since the builing block doesn't work
+        Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
+            'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
+        Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
+    
+    else:
+        # OpenMPI
+        Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=infiniband, 
+                          pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
+                          configure_opts=['--enable-mpi-cxx'])
+else:
+
+    if (mympi.lower() == "mpich"):
+
+        #mpich
+        Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
+            'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
+        Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
+    
+    else:
+        # OpenMPI
+        Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=False, 
+                          configure_opts=['--enable-mpi-cxx'])
 
 # locales time zone and language support
 Stage0 += shell(commands=['apt-get update',
