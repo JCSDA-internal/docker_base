@@ -26,29 +26,40 @@
 #            - PMI: slurm-pmi2
 #            - PSM: Yes
 #
+#------------------------------------------------------------------------
+function get_ans {
+    ans=''
+    while [[ $ans != y ]] && [[ $ans != n ]]; do
+      echo $1
+      read ans < /dev/stdin
+      if [[ $ans != y ]] && [[ $ans != n ]]; then echo "You must enter y or n"; fi
+    done
+}
+
+#------------------------------------------------------------------------
 if [[ $# -lt 1 ]]; then
    echo "usage: make_dockerfile <name>"
    exit 1
 fi
 
-NAME=${1:-"gnu-openmpi-dev"}
+CNAME=${1:-"gnu-openmpi-dev"}
 TAG=${2:-"latest"}
 HPC=${3:-"0"}
 
-CompilerName=$(echo $NAME| cut -d- -f1)
-MPIName=$(echo $NAME| cut -d- -f2)
+CompilerName=$(echo $CNAME| cut -d- -f1)
+MPIName=$(echo $CNAME| cut -d- -f2)
 
 case ${HPC} in
     "0")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
                                                      mpi=${MPIName} \
-	                                              --format docker > Dockerfile.$NAME
+	                                              --format docker > Dockerfile.$CNAME
         ;;
     "0")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
                                                      mpi=${MPIName} \
                                                      hpc="True" \
-                                                      --format docker > Dockerfile.$NAME
+                                                      --format docker > Dockerfile.$CNAME
         ;;
     "0")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
@@ -56,7 +67,7 @@ case ${HPC} in
                                                      hpc="True" \
                                                      mellanox="True" \
                                                      psm="True" \
-                                                     --format docker > Dockerfile.$NAME
+                                                     --format docker > Dockerfile.$CNAME
         ;;
     *)
         echo "ERROR: unsupported HPC option"
@@ -67,7 +78,37 @@ esac
 echo "Generated with hpccm version: " > generated.version
 hpccm --version >> generated.version
 
-echo docker image build --no-cache -f Dockerfile.$NAME -t jcsda/docker_base-$NAME:$TAG .
+if [[ ${TAG} == 'latest' ]]; then
 
-# might want to do this manually after testing
-# docker push jcsda/docker_base-$NAME
+    docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:beta .
+
+    #------------------------------------------------------------------------
+    get_ans "Push to Docker Hub?"
+
+    if [[ $ans == y ]] ; then
+
+        # save previous image in case something goes wrong
+        docker pull jcsda/docker_base-$CNAME:latest
+        docker tag jcsda/docker_base-$CNAME:latest jcsda/docker-$CNAME:revert
+        docker push jcsda/docker_base-$CNAME:revert
+        docker rmi jcsda/docker_base-$CNAME:latest
+
+        # push new image and re-tag it with latest
+        docker tag jcsda/docker_base-$CNAME:beta jcsda/docker-$CNAME:latest
+        docker rmi jcsda/docker_base-$CNAME:beta
+        docker push jcsda/docker_base-$CNAME:latest
+
+    fi
+    #------------------------------------------------------------------------
+
+else
+
+    docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:${TAG} .
+
+    get_ans "Push to Docker Hub?"
+
+    if [[ $ans == y ]] ; then
+        docker push jcsda/docker_base-$CNAME:${TAG}
+    fi
+
+fi
