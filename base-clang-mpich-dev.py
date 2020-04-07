@@ -15,7 +15,7 @@ Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh',
                               'openssh-server','libncurses-dev','libssl-dev',
                               'libx11-dev','less','man-db','tk','tcl','swig',
                               'bc','file','flex','bison','libexpat1-dev',
-                              'libxml2-dev','unzip','wish','curl','wget',
+                              'libxml2-dev','unzip','wish','curl','wget','time',
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
 
 # Install gnu compilers for gfortran
