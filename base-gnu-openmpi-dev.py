@@ -18,14 +18,14 @@ else:
     hpc=False
 
 # update apt keys
+Stage0 += apt_get(ospackages=['build-essential','gnupg2','apt-utils'])
 Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
                           'apt-get update'])
 
 # useful system tools 
 # libexpat is required by udunits
-Stage0 += apt_get(ospackages=['build-essential','tcsh','csh','ksh','apt-utils',
-                              'openssh-server','libncurses-dev','libssl-dev',
-                              'libx11-dev','less','man-db','tk','tcl','swig',
+Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-dev',
+                              'libssl-dev','libx11-dev','less','man-db','tk','tcl','swig',
                               'bc','file','flex','bison','libexpat1-dev',
                               'libxml2-dev','unzip','wish','curl','wget','time',
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
@@ -78,6 +78,7 @@ if (hpc):
 
 else:
     infiniband=False
+    withpsm=False
 
 # OpenMPI
 Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=infiniband, 
