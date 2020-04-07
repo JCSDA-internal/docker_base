@@ -83,18 +83,18 @@ if [[ ${TAG} == 'latest' ]]; then
     docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:beta .
 
     #------------------------------------------------------------------------
-    get_ans "Push to Docker Hub?"
+    get_ans "Push to Docker Hub and back up?"
 
     if [[ $ans == y ]] ; then
 
         # save previous image in case something goes wrong
         docker pull jcsda/docker_base-$CNAME:latest
-        docker tag jcsda/docker_base-$CNAME:latest jcsda/docker-$CNAME:revert
+        docker tag jcsda/docker_base-$CNAME:latest jcsda/docker_base-$CNAME:revert
         docker push jcsda/docker_base-$CNAME:revert
         docker rmi jcsda/docker_base-$CNAME:latest
 
         # push new image and re-tag it with latest
-        docker tag jcsda/docker_base-$CNAME:beta jcsda/docker-$CNAME:latest
+        docker tag jcsda/docker_base-$CNAME:beta jcsda/docker_base-$CNAME:latest
         docker rmi jcsda/docker_base-$CNAME:beta
         docker push jcsda/docker_base-$CNAME:latest
 
