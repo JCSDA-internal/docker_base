@@ -55,13 +55,13 @@ case ${HPC} in
                                                      mpi=${MPIName} \
 	                                              --format docker > Dockerfile.$CNAME
         ;;
-    "0")
+    "1")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
                                                      mpi=${MPIName} \
                                                      hpc="True" \
                                                       --format docker > Dockerfile.$CNAME
         ;;
-    "0")
+    "2")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
                                                      mpi=${MPIName} \
                                                      hpc="True" \
