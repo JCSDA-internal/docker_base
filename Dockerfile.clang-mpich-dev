@@ -81,8 +81,10 @@ RUN apt-get update -y && \
         git \
         git-flow \
         graphviz \
+        imagemagick \
         lynx \
         nedit \
+        tex4ht \
         texinfo \
         texlive-latex-recommended \
         vim && \

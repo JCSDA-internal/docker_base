@@ -44,8 +44,8 @@ Stage0 += cmake(eula=True,version="3.16.0")
 
 # editors, document tools, git, and git-flow                   
 Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
-                              'texlive-latex-recommended','texinfo',
-                              'lynx','git','git-flow'])
+                              'texlive-latex-recommended','texinfo','lynx',
+                              'git','git-flow','imagemagick','tex4ht'])
 # git-lfs
 Stage0 += shell(commands=
                 ['curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash',
@@ -86,8 +86,12 @@ if (hpc):
 
         #mpich
         # have to do this manually since the builing block doesn't work
-        Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
-            'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
+        if (mycompiler.lower() == "clang"):
+            Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
+                'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
+        else:
+            Stage0 += environment(variables={'FC':'gfortran','CC':'gcc','CXX':'g++',
+                'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
     
     else:
