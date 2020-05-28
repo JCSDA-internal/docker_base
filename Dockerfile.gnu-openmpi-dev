@@ -44,14 +44,26 @@ RUN apt-get update -y && \
 # GNU compiler
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        g++-7 \
-        gcc-7 \
-        gfortran-7 && \
+        bzip2 \
+        file \
+        g++ \
+        gcc \
+        git \
+        make \
+        perl \
+        tar \
+        wget \
+        xz-utils && \
     rm -rf /var/lib/apt/lists/*
-RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-7) 30 && \
-    update-alternatives --install /usr/bin/gcc gcc $(which gcc-7) 30 && \
-    update-alternatives --install /usr/bin/gcov gcov $(which gcov-7) 30 && \
-    update-alternatives --install /usr/bin/gfortran gfortran $(which gfortran-7) 30
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp http://ftpmirror.gnu.org/gcc/gcc-9.3.0/gcc-9.3.0.tar.xz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/gcc-9.3.0.tar.xz -C /var/tmp -J && \
+    cd /var/tmp/gcc-9.3.0 && ./contrib/download_prerequisites && \
+    mkdir -p /var/tmp/objdir && cd /var/tmp/objdir &&   /var/tmp/gcc-9.3.0/configure --prefix=/usr/local/gnu --disable-multilib --enable-languages=c,c++,fortran && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/gcc-9.3.0.tar.xz /var/tmp/gcc-9.3.0 /var/tmp/objdir
+ENV LD_LIBRARY_PATH=/usr/local/gnu/lib64:$LD_LIBRARY_PATH \
+    PATH=/usr/local/gnu/bin:$PATH
 
 # CMake version 3.16.0
 RUN apt-get update -y && \
@@ -106,7 +118,7 @@ RUN apt-get update -y && \
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-# OpenMPI version 3.1.2
+# OpenMPI version 4.0.3
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         bzip2 \
@@ -119,12 +131,12 @@ RUN apt-get update -y && \
         tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v3.1/downloads/openmpi-3.1.2.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-3.1.2.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/openmpi-3.1.2 &&   ./configure --prefix=/usr/local --enable-mpi-cxx --without-cuda --without-verbs && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v4.0/downloads/openmpi-4.0.3.tar.bz2 && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-4.0.3.tar.bz2 -C /var/tmp -j && \
+    cd /var/tmp/openmpi-4.0.3 &&   ./configure --prefix=/usr/local --enable-mpi-cxx --without-cuda --without-verbs && \
     make -j$(nproc) && \
     make -j$(nproc) install && \
-    rm -rf /var/tmp/openmpi-3.1.2.tar.bz2 /var/tmp/openmpi-3.1.2
+    rm -rf /var/tmp/openmpi-4.0.3.tar.bz2 /var/tmp/openmpi-4.0.3
 ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
     PATH=/usr/local/bin:$PATH
 

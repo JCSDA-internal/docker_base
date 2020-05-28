@@ -44,14 +44,26 @@ RUN apt-get update -y && \
 # GNU compiler
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        g++-7 \
-        gcc-7 \
-        gfortran-7 && \
+        bzip2 \
+        file \
+        g++ \
+        gcc \
+        git \
+        make \
+        perl \
+        tar \
+        wget \
+        xz-utils && \
     rm -rf /var/lib/apt/lists/*
-RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-7) 30 && \
-    update-alternatives --install /usr/bin/gcc gcc $(which gcc-7) 30 && \
-    update-alternatives --install /usr/bin/gcov gcov $(which gcov-7) 30 && \
-    update-alternatives --install /usr/bin/gfortran gfortran $(which gfortran-7) 30
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp http://ftpmirror.gnu.org/gcc/gcc-9.3.0/gcc-9.3.0.tar.xz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/gcc-9.3.0.tar.xz -C /var/tmp -J && \
+    cd /var/tmp/gcc-9.3.0 && ./contrib/download_prerequisites && \
+    mkdir -p /var/tmp/objdir && cd /var/tmp/objdir &&   /var/tmp/gcc-9.3.0/configure --prefix=/usr/local/gnu --disable-multilib --enable-languages=c,c++,fortran && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/gcc-9.3.0.tar.xz /var/tmp/gcc-9.3.0 /var/tmp/objdir
+ENV LD_LIBRARY_PATH=/usr/local/gnu/lib64:$LD_LIBRARY_PATH \
+    PATH=/usr/local/gnu/bin:$PATH
 
 # LLVM compiler
 RUN apt-get update -y && \
