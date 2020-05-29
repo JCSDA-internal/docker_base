@@ -33,7 +33,7 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
 
 # Install GNU compilers - even clang needs gfortran
-Stage0 += gnu(source=True, version='9.3.0')
+Stage0 += gnu(extra_repository=True,version='9')
 
 # Install clang compilers 
 if (mycompiler.lower() == "clang"):
