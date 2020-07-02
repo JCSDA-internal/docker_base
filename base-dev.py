@@ -1,3 +1,8 @@
+# © Copyright 2020-2020 UCAR
+# This software is licensed under the terms of the Apache Licence Version 2.0 which can be obtained at
+# http://www.apache.org/licenses/LICENSE-2.0.
+#
+
 """JEDI docker_base development container
 
 Usage:
@@ -33,7 +38,7 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libcurl4-openssl-dev','nano','screen','lsb-release'])
 
 # Install GNU compilers - even clang needs gfortran
-Stage0 += gnu(version='7')
+Stage0 += gnu(extra_repository=True,version='9')
 
 # Install clang compilers 
 if (mycompiler.lower() == "clang"):
@@ -96,7 +101,7 @@ if (hpc):
     
     else:
         # OpenMPI
-        Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=infiniband, 
+        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=infiniband, 
                           pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
                           configure_opts=['--enable-mpi-cxx'])
 else:
@@ -110,7 +115,7 @@ else:
     
     else:
         # OpenMPI
-        Stage0 += openmpi(prefix='/usr/local', version='3.1.2', cuda=False, infiniband=False, 
+        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=False, 
                           configure_opts=['--enable-mpi-cxx'])
 
 # locales time zone and language support
