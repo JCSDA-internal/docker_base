@@ -29,7 +29,7 @@ Stage0 += apt_get(ospackages=['build-essential','gnupg2','apt-utils'])
 Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
                           'apt-get update'])
 
-# useful system tools 
+# useful system tools
 # libexpat is required by udunits
 Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-dev',
                               'libssl-dev','libx11-dev','less','man-db','tk','tcl','swig',
@@ -40,14 +40,14 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
 # Install GNU compilers - even clang needs gfortran
 Stage0 += gnu(extra_repository=True,version='9')
 
-# Install clang compilers 
+# Install clang compilers
 if (mycompiler.lower() == "clang"):
     Stage0 += llvm(extra_repository=True, version='8')
 
 # get an up-to-date version of CMake
 Stage0 += cmake(eula=True,version="3.16.0")
 
-# editors, document tools, git, and git-flow                   
+# editors, document tools, git, and git-flow
 Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
                               'texlive-latex-recommended','texinfo','lynx',
                               'git','git-flow','imagemagick','tex4ht'])
@@ -56,9 +56,9 @@ Stage0 += shell(commands=
                 ['curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash',
                  'apt-get update','apt-get install -y --no-install-recommends git-lfs', 'git lfs install'])
 
-# autoconfig and debuggers                  
+# autoconfig and debuggers
 Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
-    
+
 # python3
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
                               'python3-scipy'])
@@ -66,7 +66,7 @@ Stage0 += shell(commands=['ln -s /usr/bin/python3 /usr/bin/python'])
 
 # Mellanox or inbox OFED
 if (hpc):
-    if (mxofed.lower() == "true"): 
+    if (mxofed.lower() == "true"):
         Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
     else:
         Stage0 += ofed()
@@ -98,10 +98,10 @@ if (hpc):
             Stage0 += environment(variables={'FC':'gfortran','CC':'gcc','CXX':'g++',
                 'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
-    
+
     else:
         # OpenMPI
-        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=infiniband, 
+        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=infiniband,
                           pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
                           configure_opts=['--enable-mpi-cxx'])
 else:
@@ -112,11 +112,17 @@ else:
         Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
             'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
-    
+
     else:
         # OpenMPI
-        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=False, 
+        Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=False,
                           configure_opts=['--enable-mpi-cxx'])
+
+# lcov 1.15
+Stage0 += shell(commands=
+          ['cd /usr/local/src',
+           'wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz',
+           'tar -xvf v1.15.tar.gz', 'cd lcov-1.15', 'make install'])
 
 # locales time zone and language support
 Stage0 += shell(commands=['apt-get update',
@@ -128,4 +134,3 @@ Stage0 += shell(commands=['apt-get update',
      'update-locale \"LANG=en_US.UTF-8\"',
      'update-locale \"LANGUAGE=en_US:en\"'])
 Stage0 += environment(variables={'LANG':'en_US.UTF-8','LANGUAGE':'en_US:en'})
-
