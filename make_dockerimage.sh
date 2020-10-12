@@ -42,12 +42,12 @@ function get_ans {
 
 #------------------------------------------------------------------------
 if [[ $# -lt 1 ]]; then
-   echo "usage: make_dockerfile <name>"
+   echo "usage: make_dockerfile <name> [<tag>] [<HPC>]"
    exit 1
 fi
 
 CNAME=${1:-"gnu-openmpi-dev"}
-TAG=${2:-"latest"}
+TAG=${2:-"beta"}
 HPC=${3:-"0"}
 
 CompilerName=$(echo $CNAME| cut -d- -f1)
@@ -82,37 +82,10 @@ esac
 echo "Generated with hpccm version: " > generated.version
 hpccm --version >> generated.version
 
-if [[ ${TAG} == 'latest' ]]; then
+docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:${TAG} .
 
-    docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:beta .
+get_ans "Push to Docker Hub?"
 
-    #------------------------------------------------------------------------
-    get_ans "Push to Docker Hub and back up?"
-
-    if [[ $ans == y ]] ; then
-
-        # save previous image in case something goes wrong
-        docker pull jcsda/docker_base-$CNAME:latest
-        docker tag jcsda/docker_base-$CNAME:latest jcsda/docker_base-$CNAME:revert
-        docker push jcsda/docker_base-$CNAME:revert
-        docker rmi jcsda/docker_base-$CNAME:latest
-
-        # push new image and re-tag it with latest
-        docker tag jcsda/docker_base-$CNAME:beta jcsda/docker_base-$CNAME:latest
-        docker rmi jcsda/docker_base-$CNAME:beta
-        docker push jcsda/docker_base-$CNAME:latest
-
-    fi
-    #------------------------------------------------------------------------
-
-else
-
-    docker image build --no-cache -f Dockerfile.$CNAME -t jcsda/docker_base-$CNAME:${TAG} .
-
-    get_ans "Push to Docker Hub?"
-
-    if [[ $ans == y ]] ; then
-        docker push jcsda/docker_base-$CNAME:${TAG}
-    fi
-
+if [[ $ans == y ]] ; then
+    docker push jcsda/docker_base-$CNAME:${TAG}
 fi
