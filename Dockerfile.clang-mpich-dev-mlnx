@@ -20,11 +20,8 @@ RUN apt-get update -y && \
         flex \
         ksh \
         less \
-        libboost-thread-dev \
         libcurl4-openssl-dev \
         libexpat1-dev \
-        libgmp-dev \
-        libmpfr-dev \
         libncurses-dev \
         libssl-dev \
         libx11-dev \
@@ -58,6 +55,15 @@ RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-9) 30 && \
     update-alternatives --install /usr/bin/gcc gcc $(which gcc-9) 30 && \
     update-alternatives --install /usr/bin/gcov gcov $(which gcov-9) 30 && \
     update-alternatives --install /usr/bin/gfortran gfortran $(which gfortran-9) 30
+
+# LLVM compiler
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        clang-8 \
+        libomp-8-dev && \
+    rm -rf /var/lib/apt/lists/*
+RUN update-alternatives --install /usr/bin/clang clang $(which clang-8) 30 && \
+    update-alternatives --install /usr/bin/clang++ clang++ $(which clang++-8) 30
 
 # CMake version 3.16.0
 RUN apt-get update -y && \
@@ -112,23 +118,36 @@ RUN apt-get update -y && \
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-# OFED
+# Mellanox OFED version 4.5-1.0.1.0
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -t bionic \
-        dapl2-utils \
-        ibutils \
-        ibverbs-providers \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        gnupg \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN wget -qO - https://www.mellanox.com/downloads/ofed/RPM-GPG-KEY-Mellanox | apt-key add - && \
+    mkdir -p /etc/apt/sources.list.d && wget -q -nc --no-check-certificate -P /etc/apt/sources.list.d https://linux.mellanox.com/public/repo/mlnx_ofed/4.5-1.0.1.0/ubuntu18.04/mellanox_mlnx_ofed.list && \
+    apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         ibverbs-utils \
-        infiniband-diags \
-        libdapl-dev \
-        libdapl2 \
-        libibmad-dev \
-        libibmad5 \
+        libibmad \
+        libibmad-devel \
+        libibumad \
+        libibumad-devel \
         libibverbs-dev \
         libibverbs1 \
+        libmlx4-1 \
+        libmlx4-dev \
+        libmlx5-1 \
+        libmlx5-dev \
         librdmacm-dev \
-        librdmacm1 \
-        rdmacm-utils && \
+        librdmacm1 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        libpsm-infinipath1 \
+        libpsm-infinipath1-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # SLURM PMI2 version 20.02.5
@@ -204,33 +223,32 @@ ENV CPATH=/usr/local/ucx/include:$CPATH \
     LIBRARY_PATH=/usr/local/ucx/lib:$LIBRARY_PATH \
     PATH=/usr/local/ucx/bin:$PATH
 
-# OpenMPI version 4.0.3
+ENV CC=clang \
+    CFLAGS=-fPIC \
+    CXX=clang++ \
+    CXXFLAGS=-fPIC \
+    FC=gfortran \
+    FCFLAGS=-fPIC
+
+# MPICH version 3.3.1
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        bzip2 \
         file \
-        hwloc \
-        libnuma-dev \
+        gzip \
         make \
         openssh-client \
         perl \
         tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.open-mpi.org/software/ompi/v4.0/downloads/openmpi-4.0.3.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/openmpi-4.0.3.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/openmpi-4.0.3 &&   ./configure --prefix=/usr/local --enable-mpi-cxx --with-pmi=/usr/local/slurm-pmi2 --with-ucx=/usr/local/ucx --with-verbs --without-cuda && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/mpich-3.3.1.tar.gz -C /var/tmp -z && \
+    cd /var/tmp/mpich-3.3.1 &&   ./configure --prefix=/usr/local/mpich --enable-cxx --enable-fortran && \
     make -j$(nproc) && \
     make -j$(nproc) install && \
-    rm -rf /var/tmp/openmpi-4.0.3 /var/tmp/openmpi-4.0.3.tar.bz2
-ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH \
-    PATH=/usr/local/bin:$PATH
-
-RUN cd /usr/local/src && \
-    wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
-    tar -xvf v1.15.tar.gz && \
-    cd lcov-1.15 && \
-    make install
+    rm -rf /var/tmp/mpich-3.3.1 /var/tmp/mpich-3.3.1.tar.gz
+ENV LD_LIBRARY_PATH=/usr/local/mpich/lib:$LD_LIBRARY_PATH \
+    PATH=/usr/local/mpich/bin:$PATH
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales && \

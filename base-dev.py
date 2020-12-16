@@ -35,7 +35,8 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libssl-dev','libx11-dev','less','man-db','tk','tcl','swig',
                               'bc','file','flex','bison','libexpat1-dev',
                               'libxml2-dev','unzip','wish','curl','wget','time',
-                              'libcurl4-openssl-dev','nano','screen','lsb-release'])
+                              'libcurl4-openssl-dev','nano','screen','lsb-release',
+                              'libgmp-dev','libmpfr-dev','libboost-thread-dev'])
 
 # Install GNU compilers - even clang needs gfortran
 Stage0 += gnu(extra_repository=True,version='9')
