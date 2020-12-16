@@ -53,6 +53,15 @@ HPC=${3:-"0"}
 CompilerName=$(echo $CNAME| cut -d- -f1)
 MPIName=$(echo $CNAME| cut -d- -f2)
 
+echo $CompilerName
+
+if [[ $CompilerName =~ "intel" ]]; then
+
+    echo "Building intel container"
+    docker image build --no-cache -f Dockerfile.intel-oneapi-dev -t intel-oneapi-dev:$ubuntu .
+    exit 0
+fi
+
 case ${HPC} in
     "0")
         hpccm --recipe base-dev.py --userarg compiler=${CompilerName} \
