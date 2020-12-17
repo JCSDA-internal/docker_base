@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 # requires oneapi-basekit image, assumes oneapi apt repo is configured
-ARG base_image="intel-oneapi-os-tools:ubuntu20"
+ARG base_image="jcsda/intel-oneapi-os-tools:ubuntu20"
 FROM "$base_image"
 
 ARG DEBIAN_FRONTEND=noninteractive
