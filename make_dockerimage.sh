@@ -58,8 +58,8 @@ echo $CompilerName
 if [[ $CompilerName =~ "intel" ]]; then
 
     echo "Building intel container"
-    docker image build -f Dockerfile.intel-oneapi-os-tools-ubuntu20 -t jcsda/intel-oneapi-os-tools:ubuntu20 .
-    docker image build -f Dockerfile.intel-oneapi-hpckit-ubuntu20 -t jcsda/intel-oneapi-hpckit:ubuntu20 .
+    docker image build --no-cache -f Dockerfile.intel-oneapi-os-tools-ubuntu20 -t jcsda/intel-oneapi-os-tools:ubuntu20 .
+    docker image build --no-cache -f Dockerfile.intel-oneapi-hpckit-ubuntu20 -t jcsda/intel-oneapi-hpckit:ubuntu20 .
     docker image build --no-cache -f Dockerfile.intel-oneapi-dev -t jcsda/docker_base-intel-oneapi-dev:${TAG} .
     exit 0
 fi

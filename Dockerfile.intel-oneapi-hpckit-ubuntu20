@@ -20,6 +20,7 @@ RUN apt-get update -y && \
     intel-oneapi-inspector \
     intel-oneapi-itac \
     intel-oneapi-mpi-devel \
+    intel-oneapi-mkl-devel \
     --
 
 RUN echo "if [ -z \"$INTEL_SH_GUARD\" ]; then" > /etc/profile.d/intel.sh \

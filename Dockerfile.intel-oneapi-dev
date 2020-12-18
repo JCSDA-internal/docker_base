@@ -55,6 +55,9 @@ RUN apt-get update -y && \
         unzip \
         wget \
         wish \
+        apt-utils \
+        imagemagick \
+        vim \
         xserver-xorg && \
     rm -rf /var/lib/apt/lists/*
 
@@ -81,17 +84,4 @@ RUN cd /usr/local/src && \
     tar -xvf v1.15.tar.gz && \
     cd lcov-1.15 && \
     make install
-
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o=Dpkg::Use-Pty=0 \
-    tzdata locales && \
-    ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime && \
-    locale-gen --purge en_US.UTF-8 && \
-    dpkg-reconfigure --frontend noninteractive tzdata && \
-    dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale "LANG=en_US.UTF-8" && \
-    update-locale "LANGUAGE=en_US:en"
-
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en
 
