@@ -1,0 +1,87 @@
+# syntax=docker/dockerfile:experimental
+FROM jcsda/intel-oneapi-hpckit:ubuntu20
+
+SHELL ["/bin/bash", "-c"]
+
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o=Dpkg::Use-Pty=0 \
+        bc \
+        bison \
+        build-essential \
+        byacc \
+        csh \
+        curl \
+        dirmngr \
+        doxygen \
+        emacs \
+        file \
+        flex \
+        git \
+        git-flow \
+        gnupg2 \
+        graphviz \
+        ksh \
+        less \
+        libasound2 \
+        libbz2-dev \
+        libcurl4-openssl-dev \
+        libncurses5-dev \
+        libexpat1-dev \
+        libgtk2.0-common \
+        liblz4-dev \
+        libncurses-dev \
+        libpango-1.0.0 \
+        libsnappy-dev \
+        libssl-dev \
+        libx11-dev \
+        libxml2-dev \
+        linux-headers-aws \
+        lsb-release \
+        lynx \
+        make \
+        man-db \
+        nano \
+        nedit \
+        openssh-client \
+        openssh-server \
+        screen \
+        software-properties-common \
+        swig \
+        tcl \
+        tcsh \
+        texinfo \
+        texlive-latex-recommended \
+        tk \
+        unzip \
+        wget \
+        wish \
+        apt-utils \
+        imagemagick \
+        vim \
+        xserver-xorg && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.17/cmake-3.17.2-Linux-x86_64.sh && \
+    mkdir -p /home/builder/opt && \
+    /bin/sh /var/tmp/cmake-3.17.2-Linux-x86_64.sh --prefix=/home/builder/opt --skip-license && \
+    rm -rf /var/tmp/cmake-3.17.2-Linux-x86_64.sh
+
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends git-lfs && \
+    git lfs install
+
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3-dev \
+        python3-pip \
+        python3-scipy \
+        python3-yaml && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN cd /usr/local/src && \
+    wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
+    tar -xvf v1.15.tar.gz && \
+    cd lcov-1.15 && \
+    make install
+
