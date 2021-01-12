@@ -6,7 +6,7 @@
 """JEDI docker_base development container
 
 Usage:
-hpccm --recipe base-dev.py --userarg hpc="True" --mellanox="True" --psm="True" --format docker > Dockerfile
+hpccm --recipe intel-base.py --userarg hpc="True" --mellanox="True" --psm="True" --format docker > Dockerfile
 """
 
 # Base image
