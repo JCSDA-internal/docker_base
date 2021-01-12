@@ -38,9 +38,10 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libcurl4-openssl-dev','nano','screen','lsb-release',
                               'libgmp-dev','libmpfr-dev','libboost-thread-dev'])
 
-# Install GNU compilers - even clang needs gfortran
+# Install GNU compilers - note that clang needs gfortran
 # Stage0 += gnu(extra_repository=True,version='9')
-Stage0 += gnu(version='9')
+if (mycompiler.lower() != "intel"):
+    Stage0 += gnu(version='9')
 
 # Install clang compilers
 if (mycompiler.lower() == "clang"):
@@ -56,10 +57,10 @@ Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
 # git-lfs
 Stage0 += shell(commands=
                 ['curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash',
-                 'apt-get update','apt-get install -y --no-install-recommends git-lfs', 'git lfs install'])
+                 'apt-get update','DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git-lfs', 'git lfs install --skip-repo'])
 
 # autoconfig and debuggers
-Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind','clang-tidy'])
+Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','valgrind','clang-tidy'])
 
 # python3
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
@@ -69,11 +70,15 @@ Stage0 += shell(commands=['ln -s /usr/bin/python3 /usr/bin/python'])
 # Mellanox or inbox OFED
 if (hpc):
     if (mxofed.lower() == "true"):
-        Stage0 += mlnx_ofed(version='4.7-1.0.0.1')
-        Stage0 += hpcx(version='2.7.0',mlnx_ofed='4.7-1.0.0.1',multi_thread=True)
+        Stage0 += mlnx_ofed(version='5.2-1.0.4.0')
+        Stage0 += hpcx(version='2.8.0',mlnx_ofed='5.2-1.0.4.0',multi_thread=True)
     else:
         Stage0 += ofed()
-        Stage0 += hpcx(version='2.7.0',inbox=True)
+        # omit this for now because hpccm isn't up to date with ubuntu 20.04
+        # If you really want it, you can get it to work if you manually edit the Dockerfile and
+        # replace x86_64 with aarch64 in the file name.  So, the correct filename would be
+        # http://www.mellanox.com/downloads/hpc/hpc-x/v2.8/hpcx-v2.8.0-gcc-inbox-ubuntu20.04-aarch64.tbz
+        #Stage0 += hpcx(version='2.8.0',inbox=True)
     infiniband=True
 
     # PSM library
@@ -103,7 +108,7 @@ if (hpc):
                 'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
 
-    else if (mympi.lower() == "openmpi"):
+    elif (mympi.lower() == "openmpi"):
         # OpenMPI
         Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=infiniband,
                           pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
@@ -117,7 +122,7 @@ else:
             'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.2', configure_opts=['--enable-cxx --enable-fortran'])
 
-    else if (mympi.lower() == "openmpi"):
+    elif (mympi.lower() == "openmpi"):
         # OpenMPI
         Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=False,
                           configure_opts=['--enable-mpi-cxx'])
