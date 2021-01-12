@@ -10,7 +10,7 @@ hpccm --recipe base-dev.py --userarg compiler="gnu" mpi="openmpi" hpc="True" psm
 """
 
 # Base image
-Stage0.baseimage('ubuntu:18.04')
+Stage0.baseimage('ubuntu:20.04')
 
 # get optional user arguments
 mycompiler = USERARG.get('compiler', 'gnu')
@@ -26,8 +26,8 @@ else:
 
 # update apt keys
 Stage0 += apt_get(ospackages=['build-essential','gnupg2','apt-utils'])
-Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
-                          'apt-get update'])
+#Stage0 += shell(commands=['apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157',
+#                          'apt-get update'])
 
 # useful system tools
 # libexpat is required by udunits
@@ -39,14 +39,15 @@ Stage0 += apt_get(ospackages=['tcsh','csh','ksh', 'openssh-server','libncurses-d
                               'libgmp-dev','libmpfr-dev','libboost-thread-dev'])
 
 # Install GNU compilers - even clang needs gfortran
-Stage0 += gnu(extra_repository=True,version='9')
+# Stage0 += gnu(extra_repository=True,version='9')
+Stage0 += gnu(version='9')
 
 # Install clang compilers
 if (mycompiler.lower() == "clang"):
     Stage0 += llvm(extra_repository=True, version='8')
 
 # get an up-to-date version of CMake
-Stage0 += cmake(eula=True,version="3.16.0")
+Stage0 += cmake(eula=True,version="3.19.2")
 
 # editors, document tools, git, and git-flow
 Stage0 += apt_get(ospackages=['emacs','vim','nedit','graphviz','doxygen',
@@ -58,7 +59,7 @@ Stage0 += shell(commands=
                  'apt-get update','apt-get install -y --no-install-recommends git-lfs', 'git lfs install'])
 
 # autoconfig and debuggers
-Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind'])
+Stage0 += apt_get(ospackages=['autoconf','pkg-config','ddd','gdb','kdbg','valgrind','clang-tidy'])
 
 # python3
 Stage0 += apt_get(ospackages=['python3-pip','python3-dev','python3-yaml',
@@ -68,9 +69,11 @@ Stage0 += shell(commands=['ln -s /usr/bin/python3 /usr/bin/python'])
 # Mellanox or inbox OFED
 if (hpc):
     if (mxofed.lower() == "true"):
-        Stage0 += mlnx_ofed(version='4.5-1.0.1.0')
+        Stage0 += mlnx_ofed(version='4.7-1.0.0.1')
+        Stage0 += hpcx(version='2.7.0',mlnx_ofed='4.7-1.0.0.1',multi_thread=True)
     else:
         Stage0 += ofed()
+        Stage0 += hpcx(version='2.7.0',inbox=True)
     infiniband=True
 
     # PSM library
@@ -100,7 +103,7 @@ if (hpc):
                 'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
         Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
 
-    else:
+    else if (mympi.lower() == "openmpi"):
         # OpenMPI
         Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=infiniband,
                           pmi="/usr/local/slurm-pmi2",ucx="/usr/local/ucx", with_psm=withpsm,
@@ -112,9 +115,9 @@ else:
         #mpich
         Stage0 += environment(variables={'FC':'gfortran','CC':'clang','CXX':'clang++',
             'CFLAGS':'-fPIC','CXXFLAGS':'-fPIC','FCFLAGS':'-fPIC'})
-        Stage0 += mpich(version='3.3.1', configure_opts=['--enable-cxx --enable-fortran'])
+        Stage0 += mpich(version='3.3.2', configure_opts=['--enable-cxx --enable-fortran'])
 
-    else:
+    else if (mympi.lower() == "openmpi"):
         # OpenMPI
         Stage0 += openmpi(prefix='/usr/local', version='4.0.3', cuda=False, infiniband=False,
                           configure_opts=['--enable-mpi-cxx'])
@@ -124,14 +127,3 @@ Stage0 += shell(commands=
           ['cd /usr/local/src',
            'wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz',
            'tar -xvf v1.15.tar.gz', 'cd lcov-1.15', 'make install'])
-
-# locales time zone and language support
-Stage0 += shell(commands=['apt-get update',
-     'DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales',
-     'ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime',
-     'locale-gen --purge en_US.UTF-8',
-     'dpkg-reconfigure --frontend noninteractive tzdata',
-     'dpkg-reconfigure --frontend=noninteractive locales',
-     'update-locale \"LANG=en_US.UTF-8\"',
-     'update-locale \"LANGUAGE=en_US:en\"'])
-Stage0 += environment(variables={'LANG':'en_US.UTF-8','LANGUAGE':'en_US:en'})
