@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -6,9 +6,6 @@ RUN apt-get update -y && \
         build-essential \
         gnupg2 && \
     rm -rf /var/lib/apt/lists/*
-
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 && \
-    apt-get update
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -20,8 +17,11 @@ RUN apt-get update -y && \
         flex \
         ksh \
         less \
+        libboost-thread-dev \
         libcurl4-openssl-dev \
         libexpat1-dev \
+        libgmp-dev \
+        libmpfr-dev \
         libncurses-dev \
         libssl-dev \
         libx11-dev \
@@ -43,9 +43,6 @@ RUN apt-get update -y && \
 
 # GNU compiler
 RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends software-properties-common && \
-    apt-add-repository ppa:ubuntu-toolchain-r/test -y && \
-    apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         g++-9 \
         gcc-9 \
@@ -60,21 +57,21 @@ RUN update-alternatives --install /usr/bin/g++ g++ $(which g++-9) 30 && \
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         clang-8 \
-        libomp-dev && \
+        libomp-8-dev && \
     rm -rf /var/lib/apt/lists/*
 RUN update-alternatives --install /usr/bin/clang clang $(which clang-8) 30 && \
     update-alternatives --install /usr/bin/clang++ clang++ $(which clang++-8) 30
 
-# CMake version 3.16.0
+# CMake version 3.19.2
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         make \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.sh && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.19/cmake-3.19.2-Linux-x86_64.sh && \
     mkdir -p /usr/local && \
-    /bin/sh /var/tmp/cmake-3.16.0-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
-    rm -rf /var/tmp/cmake-3.16.0-Linux-x86_64.sh
+    /bin/sh /var/tmp/cmake-3.19.2-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
+    rm -rf /var/tmp/cmake-3.19.2-Linux-x86_64.sh
 ENV PATH=/usr/local/bin:$PATH
 
 RUN apt-get update -y && \
@@ -95,15 +92,15 @@ RUN apt-get update -y && \
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && \
-    apt-get install -y --no-install-recommends git-lfs && \
-    git lfs install
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git-lfs && \
+    git lfs install --skip-repo
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         autoconf \
+        clang-tidy \
         ddd \
         gdb \
-        kdbg \
         pkg-config \
         valgrind && \
     rm -rf /var/lib/apt/lists/*
@@ -125,7 +122,7 @@ ENV CC=clang \
     FC=gfortran \
     FCFLAGS=-fPIC
 
-# MPICH version 3.3.1
+# MPICH version 3.3.2
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         file \
@@ -136,25 +133,19 @@ RUN apt-get update -y && \
         tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/mpich-3.3.1.tar.gz -C /var/tmp -z && \
-    cd /var/tmp/mpich-3.3.1 &&   ./configure --prefix=/usr/local/mpich --enable-cxx --enable-fortran && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/mpich-3.3.2.tar.gz -C /var/tmp -z && \
+    cd /var/tmp/mpich-3.3.2 &&   ./configure --prefix=/usr/local/mpich --enable-cxx --enable-fortran && \
     make -j$(nproc) && \
     make -j$(nproc) install && \
-    rm -rf /var/tmp/mpich-3.3.1.tar.gz /var/tmp/mpich-3.3.1
+    rm -rf /var/tmp/mpich-3.3.2 /var/tmp/mpich-3.3.2.tar.gz
 ENV LD_LIBRARY_PATH=/usr/local/mpich/lib:$LD_LIBRARY_PATH \
     PATH=/usr/local/mpich/bin:$PATH
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales && \
-    ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime && \
-    locale-gen --purge en_US.UTF-8 && \
-    dpkg-reconfigure --frontend noninteractive tzdata && \
-    dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale "LANG=en_US.UTF-8" && \
-    update-locale "LANGUAGE=en_US:en"
-
-ENV LANG=en_US.UTF-8 \
-    LANGUAGE=en_US:en
+RUN cd /usr/local/src && \
+    wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
+    tar -xvf v1.15.tar.gz && \
+    cd lcov-1.15 && \
+    make install
 
 
