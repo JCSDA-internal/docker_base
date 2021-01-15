@@ -113,23 +113,6 @@ RUN apt-get update -y && \
         rdmacm-utils && \
     rm -rf /var/lib/apt/lists/*
 
-# SLURM PMI2 version 20.02.5
-RUN apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        bzip2 \
-        file \
-        make \
-        perl \
-        tar \
-        wget && \
-    rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://download.schedmd.com/slurm/slurm-20.02.5.tar.bz2 && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/slurm-20.02.5.tar.bz2 -C /var/tmp -j && \
-    cd /var/tmp/slurm-20.02.5 &&   ./configure --prefix=/usr/local/slurm-pmi2 && \
-    cd /var/tmp/slurm-20.02.5 && \
-    make -C contribs/pmi2 install && \
-    rm -rf /var/tmp/slurm-20.02.5 /var/tmp/slurm-20.02.5.tar.bz2
-
 # KNEM version 1.1.4
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -185,6 +168,32 @@ ENV CPATH=/usr/local/ucx/include:$CPATH \
     LD_LIBRARY_PATH=/usr/local/ucx/lib:$LD_LIBRARY_PATH \
     LIBRARY_PATH=/usr/local/ucx/lib:$LIBRARY_PATH \
     PATH=/usr/local/ucx/bin:$PATH
+
+# SLURM PMI2 version 19.05.4
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        default-libmysqlclient-dev \
+        libfreeipmi-dev \
+        libfreeipmi-dev \
+        libglib2.0-0 \
+        libglib2.0-dev \
+        libgtk-3-0 \
+        libgtk-3-dev \
+        libhwloc-dev \
+        libjson-c-dev \
+        liblua5.2-0 \
+        liblua5.2-dev \
+        libmunge-dev \
+        libmunge2 \
+        libpam0g-dev \
+        libyaml-dev && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://download.schedmd.com/slurm/slurm-19.05.4.tar.bz2 && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/slurm-19.05.4.tar.bz2 -C /var/tmp -j && \
+    cd /var/tmp/slurm-19.05.4 &&   ./configure --prefix=/usr/local/slurm-pmi2 && \
+    cd /var/tmp/slurm-19.05.4 && \
+    make -C contribs/pmi2 install && \
+    rm -rf /var/tmp/slurm-19.05.4 /var/tmp/slurm-19.05.4.tar.bz2
 
 RUN cd /usr/local/src && \
     wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
