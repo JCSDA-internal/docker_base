@@ -42,7 +42,7 @@ function get_ans {
 
 #------------------------------------------------------------------------
 if [[ $# -lt 1 ]]; then
-   echo "usage: make_dockerfile <name> [<tag>] [<HPC>]"
+   echo "usage: make_dockerimage <name> [<tag>] [<HPC>]"
    exit 1
 fi
 
