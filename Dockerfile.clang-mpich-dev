@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -6,6 +6,9 @@ RUN apt-get update -y && \
         build-essential \
         gnupg2 && \
     rm -rf /var/lib/apt/lists/*
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 && \
+    apt-get update
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -17,11 +20,8 @@ RUN apt-get update -y && \
         flex \
         ksh \
         less \
-        libboost-thread-dev \
         libcurl4-openssl-dev \
         libexpat1-dev \
-        libgmp-dev \
-        libmpfr-dev \
         libncurses-dev \
         libssl-dev \
         libx11-dev \
@@ -43,6 +43,9 @@ RUN apt-get update -y && \
 
 # GNU compiler
 RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends software-properties-common && \
+    apt-add-repository ppa:ubuntu-toolchain-r/test -y && \
+    apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         g++-9 \
         gcc-9 \
@@ -62,16 +65,16 @@ RUN apt-get update -y && \
 RUN update-alternatives --install /usr/bin/clang clang $(which clang-8) 30 && \
     update-alternatives --install /usr/bin/clang++ clang++ $(which clang++-8) 30
 
-# CMake version 3.19.2
+# CMake version 3.16.0
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         make \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.19/cmake-3.19.2-Linux-x86_64.sh && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://cmake.org/files/v3.16/cmake-3.16.0-Linux-x86_64.sh && \
     mkdir -p /usr/local && \
-    /bin/sh /var/tmp/cmake-3.19.2-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
-    rm -rf /var/tmp/cmake-3.19.2-Linux-x86_64.sh
+    /bin/sh /var/tmp/cmake-3.16.0-Linux-x86_64.sh --prefix=/usr/local --skip-license && \
+    rm -rf /var/tmp/cmake-3.16.0-Linux-x86_64.sh
 ENV PATH=/usr/local/bin:$PATH
 
 RUN apt-get update -y && \
@@ -92,15 +95,15 @@ RUN apt-get update -y && \
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends git-lfs && \
-    git lfs install --skip-repo
+    apt-get install -y --no-install-recommends git-lfs && \
+    git lfs install
 
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         autoconf \
-        clang-tidy \
         ddd \
         gdb \
+        kdbg \
         pkg-config \
         valgrind && \
     rm -rf /var/lib/apt/lists/*
@@ -115,6 +118,98 @@ RUN apt-get update -y && \
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
+# OFED
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -t bionic \
+        dapl2-utils \
+        ibutils \
+        ibverbs-providers \
+        ibverbs-utils \
+        infiniband-diags \
+        libdapl-dev \
+        libdapl2 \
+        libibmad-dev \
+        libibmad5 \
+        libibverbs-dev \
+        libibverbs1 \
+        librdmacm-dev \
+        librdmacm1 \
+        rdmacm-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+# SLURM PMI2 version 20.02.5
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        bzip2 \
+        file \
+        make \
+        perl \
+        tar \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://download.schedmd.com/slurm/slurm-20.02.5.tar.bz2 && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/slurm-20.02.5.tar.bz2 -C /var/tmp -j && \
+    cd /var/tmp/slurm-20.02.5 &&   ./configure --prefix=/usr/local/slurm-pmi2 && \
+    cd /var/tmp/slurm-20.02.5 && \
+    make -C contribs/pmi2 install && \
+    rm -rf /var/tmp/slurm-20.02.5 /var/tmp/slurm-20.02.5.tar.bz2
+
+# KNEM version 1.1.4
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch knem-1.1.4 https://gitlab.inria.fr/knem/knem.git knem && cd - && \
+    mkdir -p /usr/local/knem && \
+    cd /var/tmp/knem && \
+    mkdir -p /usr/local/knem/include && \
+    cp common/*.h /usr/local/knem/include && \
+    rm -rf /var/tmp/knem
+ENV CPATH=/usr/local/knem/include:$CPATH
+
+# XPMEM branch master
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        autoconf \
+        automake \
+        ca-certificates \
+        file \
+        git \
+        libtool \
+        make && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch master https://gitlab.com/hjelmn/xpmem.git xpmem && cd - && \
+    cd /var/tmp/xpmem && \
+    autoreconf --install && \
+    cd /var/tmp/xpmem &&   ./configure --prefix=/usr/local/xpmem --disable-kernel-module && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/xpmem
+ENV CPATH=/usr/local/xpmem/include:$CPATH \
+    LD_LIBRARY_PATH=/usr/local/xpmem/lib:$LD_LIBRARY_PATH \
+    LIBRARY_PATH=/usr/local/xpmem/lib:$LIBRARY_PATH
+
+# UCX version 1.9.0
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        binutils-dev \
+        file \
+        libnuma-dev \
+        make \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/openucx/ucx/releases/download/v1.9.0/ucx-1.9.0.tar.gz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/ucx-1.9.0.tar.gz -C /var/tmp -z && \
+    cd /var/tmp/ucx-1.9.0 &&   ./configure --prefix=/usr/local/ucx --disable-assertions --disable-debug --disable-doxygen-doc --disable-logging --disable-params-check --enable-optimizations --with-knem --with-rdmacm --with-verbs --with-xpmem --without-cuda && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/ucx-1.9.0 /var/tmp/ucx-1.9.0.tar.gz
+ENV CPATH=/usr/local/ucx/include:$CPATH \
+    LD_LIBRARY_PATH=/usr/local/ucx/lib:$LD_LIBRARY_PATH \
+    LIBRARY_PATH=/usr/local/ucx/lib:$LIBRARY_PATH \
+    PATH=/usr/local/ucx/bin:$PATH
+
 ENV CC=clang \
     CFLAGS=-fPIC \
     CXX=clang++ \
@@ -122,7 +217,7 @@ ENV CC=clang \
     FC=gfortran \
     FCFLAGS=-fPIC
 
-# MPICH version 3.3.2
+# MPICH version 3.3.1
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         file \
@@ -133,19 +228,25 @@ RUN apt-get update -y && \
         tar \
         wget && \
     rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/3.3.2/mpich-3.3.2.tar.gz && \
-    mkdir -p /var/tmp && tar -x -f /var/tmp/mpich-3.3.2.tar.gz -C /var/tmp -z && \
-    cd /var/tmp/mpich-3.3.2 &&   ./configure --prefix=/usr/local/mpich --enable-cxx --enable-fortran && \
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/mpich-3.3.1.tar.gz -C /var/tmp -z && \
+    cd /var/tmp/mpich-3.3.1 &&   ./configure --prefix=/usr/local/mpich --enable-cxx --enable-fortran && \
     make -j$(nproc) && \
     make -j$(nproc) install && \
-    rm -rf /var/tmp/mpich-3.3.2 /var/tmp/mpich-3.3.2.tar.gz
+    rm -rf /var/tmp/mpich-3.3.1 /var/tmp/mpich-3.3.1.tar.gz
 ENV LD_LIBRARY_PATH=/usr/local/mpich/lib:$LD_LIBRARY_PATH \
     PATH=/usr/local/mpich/bin:$PATH
 
-RUN cd /usr/local/src && \
-    wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
-    tar -xvf v1.15.tar.gz && \
-    cd lcov-1.15 && \
-    make install
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata locales && \
+    ln -fs /usr/share/zoneinfo/America/Denver /etc/localtime && \
+    locale-gen --purge en_US.UTF-8 && \
+    dpkg-reconfigure --frontend noninteractive tzdata && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale "LANG=en_US.UTF-8" && \
+    update-locale "LANGUAGE=en_US:en"
+
+ENV LANG=en_US.UTF-8 \
+    LANGUAGE=en_US:en
 
 

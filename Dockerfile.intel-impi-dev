@@ -94,6 +94,107 @@ RUN apt-get update -y && \
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
+# OFED
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -t focal \
+        dapl2-utils \
+        ibutils \
+        ibverbs-providers \
+        ibverbs-utils \
+        infiniband-diags \
+        libdapl-dev \
+        libdapl2 \
+        libibmad-dev \
+        libibmad5 \
+        libibverbs-dev \
+        libibverbs1 \
+        librdmacm-dev \
+        librdmacm1 \
+        rdmacm-utils && \
+    rm -rf /var/lib/apt/lists/*
+
+# KNEM version 1.1.4
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        ca-certificates \
+        git && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch knem-1.1.4 https://gitlab.inria.fr/knem/knem.git knem && cd - && \
+    mkdir -p /usr/local/knem && \
+    cd /var/tmp/knem && \
+    mkdir -p /usr/local/knem/include && \
+    cp common/*.h /usr/local/knem/include && \
+    rm -rf /var/tmp/knem
+ENV CPATH=/usr/local/knem/include:$CPATH
+
+# XPMEM branch master
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        autoconf \
+        automake \
+        ca-certificates \
+        file \
+        git \
+        libtool \
+        make && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && cd /var/tmp && git clone --depth=1 --branch master https://gitlab.com/hjelmn/xpmem.git xpmem && cd - && \
+    cd /var/tmp/xpmem && \
+    autoreconf --install && \
+    cd /var/tmp/xpmem &&   ./configure --prefix=/usr/local/xpmem --disable-kernel-module && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/xpmem
+ENV CPATH=/usr/local/xpmem/include:$CPATH \
+    LD_LIBRARY_PATH=/usr/local/xpmem/lib:$LD_LIBRARY_PATH \
+    LIBRARY_PATH=/usr/local/xpmem/lib:$LIBRARY_PATH
+
+# UCX version 1.9.0
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        binutils-dev \
+        file \
+        libnuma-dev \
+        make \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://github.com/openucx/ucx/releases/download/v1.9.0/ucx-1.9.0.tar.gz && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/ucx-1.9.0.tar.gz -C /var/tmp -z && \
+    cd /var/tmp/ucx-1.9.0 &&   ./configure --prefix=/usr/local/ucx --disable-assertions --disable-debug --disable-doxygen-doc --disable-logging --disable-params-check --enable-optimizations --with-knem --with-rdmacm --with-verbs --with-xpmem --without-cuda && \
+    make -j$(nproc) && \
+    make -j$(nproc) install && \
+    rm -rf /var/tmp/ucx-1.9.0 /var/tmp/ucx-1.9.0.tar.gz
+ENV CPATH=/usr/local/ucx/include:$CPATH \
+    LD_LIBRARY_PATH=/usr/local/ucx/lib:$LD_LIBRARY_PATH \
+    LIBRARY_PATH=/usr/local/ucx/lib:$LIBRARY_PATH \
+    PATH=/usr/local/ucx/bin:$PATH
+
+# SLURM PMI2 version 19.05.4
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        default-libmysqlclient-dev \
+        libfreeipmi-dev \
+        libfreeipmi-dev \
+        libglib2.0-0 \
+        libglib2.0-dev \
+        libgtk-3-0 \
+        libgtk-3-dev \
+        libhwloc-dev \
+        libjson-c-dev \
+        liblua5.2-0 \
+        liblua5.2-dev \
+        libmunge-dev \
+        libmunge2 \
+        libpam0g-dev \
+        libyaml-dev && \
+    rm -rf /var/lib/apt/lists/*
+RUN mkdir -p /var/tmp && wget -q -nc --no-check-certificate -P /var/tmp https://download.schedmd.com/slurm/slurm-19.05.4.tar.bz2 && \
+    mkdir -p /var/tmp && tar -x -f /var/tmp/slurm-19.05.4.tar.bz2 -C /var/tmp -j && \
+    cd /var/tmp/slurm-19.05.4 &&   ./configure --prefix=/usr/local/slurm-pmi2 && \
+    cd /var/tmp/slurm-19.05.4 && \
+    make -C contribs/pmi2 install && \
+    rm -rf /var/tmp/slurm-19.05.4 /var/tmp/slurm-19.05.4.tar.bz2
+
 RUN cd /usr/local/src && \
     wget https://github.com/linux-test-project/lcov/archive/v1.15.tar.gz && \
     tar -xvf v1.15.tar.gz && \

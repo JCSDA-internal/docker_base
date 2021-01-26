@@ -48,10 +48,12 @@ fi
 
 CNAME=${1:-"gnu-openmpi-dev"}
 TAG=${2:-"beta"}
-HPC=${3:-"0"}
+HPC=${3:-"1"}
 
 CompilerName=$(echo $CNAME| cut -d- -f1)
 MPIName=$(echo $CNAME| cut -d- -f2)
+
+[[ HPC == 2 ]] && CNAME=${CNAME}-mlnx
 
 echo $CompilerName
 
