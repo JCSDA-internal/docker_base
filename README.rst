@@ -63,6 +63,7 @@ Then just run the ``make_dockerimage.sh`` script to build a container (respond t
 The script takes three arguments.  The first is the name of the container.  This should follow the naming convention of ``<compiler>-<mpi>-dev``.  The last component of this name indicates the type of container, but since application and tutorial containers are generally built from development containers, ``dev`` is generally appropriate here.
 
 Currently supported names on JCSDA Docker Hub include:
+
 - ``gnu-openmpi-dev``
 - ``clang-mpich-dev``
 - ``intel-impi-dev``
