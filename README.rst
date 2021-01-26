@@ -42,7 +42,7 @@ How to build the docker_base image
 
 This repository makes use of `NVIDIA's HPC Container Maker <https://github.com/NVIDIA/hpc-container-maker>`_ so, if you want to make changes, **do not edit the Dockerfiles directly**.
 
-Instead, edit the `base-dev.py` file.  This is what generates the Dockerfiles automatically.
+Instead, edit the `base-dev.py` python file.  This is what generates the Dockerfiles automatically.
 
 So, if you want to build `docker_base` containers, the first step is to install the HPC container maker, ``hpccm``.  This is a python package that you can install with ``pip`` or ``conda``
 
@@ -54,7 +54,7 @@ So, if you want to build `docker_base` containers, the first step is to install 
 
   conda install -c conda-forge hpccm
 
-Then just run the ``make_dockerimage`` script to build a container (respond to questions if prompted):
+Then just run the ``make_dockerimage.sh`` script to build a container (respond to questions if prompted):
 
 .. code-block:: bash
 
@@ -62,11 +62,16 @@ Then just run the ``make_dockerimage`` script to build a container (respond to q
 
 The script takes three arguments.  The first is the name of the container.  This should follow the naming convention of ``<compiler>-<mpi>-dev``.  The last component of this name indicates the type of container, but since application and tutorial containers are generally built from development containers, ``dev`` is generally appropriate here.
 
-The second argument is the tag for the docker container.  If omitted, the default value is ``beta``.  As noted below, the typical workflow is to create a ``beta`` version of the container first for testing.  Then, when tests pass, you can push it to docker hub.
+Currently supported names on JCSDA Docker Hub include:
+- ``gnu-openmpi-dev``
+- ``clang-mpich-dev``
+- ``intel-impi-dev``
+
+The second argument to ``make_dockerimage.sh`` is the tag for the docker container.  If omitted, the default value is ``beta``.  As noted below, the typical workflow is to create a ``beta`` version of the container first for testing.  Then, when tests pass, you can push it to docker hub.
 
 The third argument to ``make_dockerimage.sh`` is the HPC flag and it controls the optional enhancements for HPC environments referred to above.   If you only plan to use the container for single-node development and testing, then these optional HPC components are not needed so you can set this value to zero.
 
-The default value for this HPC flag is 1, which means that generic infiniband OFED drivers are included in the container, along with other HPC-ready components such as UCX.  Benchmarking indicate that this does not significantly influence the single-node performance or significantly increase the size of the container so these components are included by default, in case users do want to run applications across nodes on HPC systems.
+The default value for this HPC flag is 1, which means that generic infiniband OFED drivers are included in the container, along with other HPC-ready components such as UCX and slurm-pmi2.  Benchmarking indicate that this does not significantly influence the single-node performance or significantly increase the size of the container so these components are included by default, in case users do want to run applications across nodes on HPC systems.
 
 Setting the HPC flag to 2 installs the Mellanox OFED infiniband drivers instead of the generic OFED drivers.  The generic drivers are expected to be more portable but the mellanox version can give better performance on systems that have mellanox hardware.
 
