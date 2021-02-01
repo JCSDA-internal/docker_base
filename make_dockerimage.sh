@@ -5,10 +5,10 @@
 
 
 #
-# make_dockerfile.sh - Generate the dockerfile from base.py via HPCCM
+# make_dockerimage.sh - Generate the dockerfile from base.py via HPCCM
 #
 # Useage:
-# make_dockerfile.sh <name> <tag> <hpc>
+# make_dockerimage.sh <name> <tag> <hpc>
 #
 # <name> - name of image to build in format <compiler>-<mpi>-<type>
 #           where <type> is dev (development) or app (application)
@@ -42,27 +42,20 @@ function get_ans {
 
 #------------------------------------------------------------------------
 if [[ $# -lt 1 ]]; then
-   echo "usage: make_dockerfile <name> [<tag>] [<HPC>]"
+   echo "usage: make_dockerimage <name> [<tag>] [<HPC>]"
    exit 1
 fi
 
 CNAME=${1:-"gnu-openmpi-dev"}
 TAG=${2:-"beta"}
-HPC=${3:-"0"}
+HPC=${3:-"1"}
 
 CompilerName=$(echo $CNAME| cut -d- -f1)
 MPIName=$(echo $CNAME| cut -d- -f2)
 
+[[ HPC == 2 ]] && CNAME=${CNAME}-mlnx
+
 echo $CompilerName
-
-if [[ $CompilerName =~ "intel" ]]; then
-
-    echo "Building intel container"
-    docker image build --no-cache -f Dockerfile.intel-oneapi-os-tools-ubuntu20 -t jcsda/intel-oneapi-os-tools:ubuntu20 .
-    docker image build --no-cache -f Dockerfile.intel-oneapi-hpckit-ubuntu20 -t jcsda/intel-oneapi-hpckit:ubuntu20 .
-    docker image build --no-cache -f Dockerfile.intel-oneapi-dev -t jcsda/docker_base-intel-oneapi-dev:${TAG} .
-    exit 0
-fi
 
 case ${HPC} in
     "0")
