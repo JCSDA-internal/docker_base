@@ -97,7 +97,7 @@ if (hpc):
     # Warning: installing slurm-pmi2 before the compilers and jedi-stack means
     # that some options are not selected, such as support for hdf5, pmix, and netloc
     # If we're preformance tuning, we may want to re-install this at later stage
-    Stage0 += slurm_pmi2(version='19.05.4',ospackages=['libgtk-3-0','libgtk-3-dev',
+    Stage0 += slurm_pmi2(version='20.02.7',ospackages=['libgtk-3-0','libgtk-3-dev',
               'libglib2.0-0','libglib2.0-dev','liblua5.2-0','liblua5.2-dev',
               'libmunge2','libmunge-dev','libyaml-dev','libhwloc-dev','libjson-c-dev',
               'libfreeipmi-dev','default-libmysqlclient-dev','libpam0g-dev',
